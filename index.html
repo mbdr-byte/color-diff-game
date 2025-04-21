@@ -3,33 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Color Difference Game</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Color Difference Game</title> <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
     <meta name="description" content="Test your color perception! Find the different colored square in this fun and challenging web game. How high can you score?">
     <meta name="keywords" content="color test, color difference game, perception test, online game, html game, color vision">
+
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://color-game.mbdr.ai/"> <meta property="og:title" content="Color Difference Test - How Good Is Your Vision?">
-    <meta property="og:description" content="Challenge your perception! Find the odd color out in this addictive web game.">
-    <meta property="og:image" content="/assets/preview.png"> <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://color-game.mbdr.ai/"> <meta property="twitter:title" content="Color Difference Test - How Good Is Your Vision?">
+    <meta property="og:url" content="https://color-game.mbdr.ai/"> <meta property="og:title" content="Color Difference Game - How Good Is Your Vision?">
+    <meta property="og:description" content="Challenge your perception! Find the odd color out in this addictive web game."> <meta property="og:image" content="/assets/preview.png">
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://color-game.mbdr.ai/"> <meta property="twitter:title" content="Color Difference Game - How Good Is Your Vision?">
     <meta property="twitter:description" content="Challenge your perception! Find the odd color out in this addictive web game.">
-    <meta property="twitter:image" content="/assets/preview.png">
-    <link rel="icon" href="/favicon.png" sizes="any">
-    <link rel="shortcut icon" href="/favicon.png">
-
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6P5YEMZ84D"></script>
-    <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'G-6P5YEMZ84D', { website: 'Color Difference Game' });
-    </script>
+    <meta property="twitter:image" content="/assets/preview.png"> <link rel="icon" href="/favicon.ico" sizes="any"> <link rel="shortcut icon" href="/favicon.ico">
     <style>
         /* Apply the game font */
-        body, button, .game-font {
+        body, button, .game-font, input, textarea, select { /* Ensure all interactive elements use the font */
             font-family: 'Press Start 2P', cursive;
         }
         body {
@@ -37,20 +26,17 @@
             justify-content: space-between; min-height: 100vh; padding: 1rem;
             background-color: #1a202c; color: #e2e8f0;
         }
-        /* --- NEW RULE --- */
-        /* Ensure the main game UI container centers its content */
+        /* Main game UI container */
         #main-game-ui {
-            display: flex;
-            flex-direction: column;
-            align-items: center; /* Center children horizontally */
-            width: 100%; /* Take available width */
+            display: flex; flex-direction: column; align-items: center;
+            width: 100%;
         }
         /* Grid Container */
         #grid-container {
             display: flex; justify-content: center; align-items: center;
-            width: 100%; /* Take available width within parent */
-            max-width: 85vh; max-height: 75vh; aspect-ratio: 1 / 1;
-            padding: 10px; flex-grow: 1; flex-shrink: 1; margin-top: 1rem; margin-bottom: 1rem;
+            width: 100%; max-width: 85vh; max-height: 70vh; /* Slightly reduced max-height */
+            aspect-ratio: 1 / 1; padding: 10px; flex-grow: 1; flex-shrink: 1;
+            margin-top: 0.5rem; margin-bottom: 0.5rem; /* Reduced margins */
         }
         /* Grid */
         #grid {
@@ -78,38 +64,55 @@
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.75);
             display: flex; justify-content: center; align-items: center; z-index: 200;
             opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease;
+            padding: 1rem; /* Add padding for smaller screens */
          }
          .modal.visible { opacity: 1; visibility: visible; }
          .modal-content {
-            background-color: #2d3748; color: #e2e8f0; padding: 2rem; border-radius: 10px;
-            text-align: center; border: 2px solid #4a5568; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            max-width: 90%; width: 500px;
+            background-color: #2d3748; color: #e2e8f0; padding: 1.5rem; /* Adjusted padding */
+            border-radius: 10px; text-align: center; border: 2px solid #4a5568;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5); max-width: 95%; /* Adjusted max-width */
+            width: 500px;
          }
          .modal-content h2 { font-size: 1.5rem; margin-bottom: 1rem; }
          .modal-content p { font-size: 0.9rem; margin-bottom: 0.8rem; line-height: 1.5; }
-         .modal-content button {
-            color: #1a202c; padding: 0.6rem 1.2rem; border: none; border-radius: 5px;
-            cursor: pointer; font-size: 1rem; margin-top: 1rem;
+         .modal-content button, .share-button { /* Style share buttons like other buttons */
+            color: #1a202c; padding: 0.6rem 1rem; border: none; border-radius: 5px; /* Adjusted padding */
+            cursor: pointer; font-size: 0.9rem; margin-top: 1rem; /* Adjusted font size */
             transition: background-color 0.2s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            text-decoration: none; /* Remove underline from links styled as buttons */
+            display: inline-block; /* Allow margin/padding */
+            margin-left: 0.25rem; margin-right: 0.25rem; /* Spacing between buttons */
          }
-         .modal-content button:hover { background-color: #38a169; }
+         .modal-content button:hover, .share-button:hover { background-color: #38a169; }
 
-         /* Specific Modal Styles */
+         /* Specific Modal & Button Styles */
          #instructions-modal .modal-content h2 { color: #f6e05e; }
          #instructions-modal button { background-color: #63b3ed; }
          #instructions-modal button:hover { background-color: #4299e1; }
+
          #game-over-modal .modal-content h2 { color: #e53e3e; }
-         #game-over-modal button { background-color: #48bb78; }
-         #game-over-modal button:hover { background-color: #38a169; }
+         #game-over-modal #restart-button { background-color: #48bb78; } /* Green restart */
+         #game-over-modal #restart-button:hover { background-color: #38a169; }
+
+         /* Share Button Specific Styles */
+         .share-button-container {
+             margin-top: 1.5rem;
+             padding-top: 1rem;
+             border-top: 1px solid #4a5568; /* Separator line */
+         }
+         .share-button.twitter { background-color: #1DA1F2; }
+         .share-button.twitter:hover { background-color: #0c85d0; }
+         .share-button.facebook { background-color: #1877F2; }
+         .share-button.facebook:hover { background-color: #1158b2; }
+         .share-button.linkedin { background-color: #0A66C2; }
+         .share-button.linkedin:hover { background-color: #084c94; }
+
 
          .score-value { color: #63b3ed; font-weight: bold; }
          .lives-container { font-size: 1rem; margin-left: 1rem; color: #f56565; }
 
          /* Hide/Show game UI */
-         .game-ui {
-            opacity: 0; visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-         }
+         .game-ui { opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }
          .game-ui.visible { opacity: 1; visibility: visible; }
 
     </style>
@@ -125,17 +128,16 @@
             </div>
         </div>
         <div id="grid-container"><div id="grid" class="gap-1"></div></div>
-        <div class="h-10 flex-shrink-0"></div> </div>
+        <div class="h-5 flex-shrink-0"></div> </div>
 
     <div id="message-box">Correct!</div>
 
     <div id="instructions-modal" class="modal visible">
         <div class="modal-content">
             <h2>How To Play</h2>
-            <p>Welcome to the Color Diff Test!</p>
-            <p>Your goal is simple: Find the one square that has a slightly different color from all the others.</p>
-            <p>Click the different square to advance to the next level. The colors will get harder to tell apart, and the grid will grow!</p>
-            <p>You have 3 lives. Be careful!</p>
+            <p>Welcome to the Color Diff Game!</p>
+            <p>Find the square with a slightly different color.</p>
+            <p>Click it to level up. It gets harder! You have 3 lives.</p>
             <button id="start-button">Start Game</button>
         </div>
     </div>
@@ -146,6 +148,13 @@
             <p>Your Score: <span id="final-score" class="score-value">0</span></p>
             <p>High Score: <span id="high-score" class="score-value">0</span></p>
             <button id="restart-button">Play Again?</button>
+
+            <div class="share-button-container">
+                <p style="font-size: 0.8rem; margin-bottom: 0.5rem;">Share Your Score:</p>
+                <a id="share-twitter" href="#" target="_blank" rel="noopener noreferrer" class="share-button twitter">X</a>
+                <a id="share-facebook" href="#" target="_blank" rel="noopener noreferrer" class="share-button facebook">Facebook</a>
+                <a id="share-linkedin" href="#" target="_blank" rel="noopener noreferrer" class="share-button linkedin">LinkedIn</a>
+            </div>
         </div>
     </div>
 
@@ -170,8 +179,13 @@
         const instructionsModal = document.getElementById('instructions-modal');
         const startButton = document.getElementById('start-button');
         const mainGameUI = document.getElementById('main-game-ui');
+        // Social Share Links
+        const shareTwitter = document.getElementById('share-twitter');
+        const shareFacebook = document.getElementById('share-facebook');
+        const shareLinkedIn = document.getElementById('share-linkedin');
 
-        // --- Color Conversion Constants & Functions (RGB <-> LAB) ---
+
+        // --- Color Conversion Constants & Functions (RGB <-> LAB - Unchanged) ---
         const REF_X = 95.047, REF_Y = 100.000, REF_Z = 108.883;
         function srgbToLinear(v) { v /= 255; return (v <= 0.04045) ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }
         function linearToSrgb(v) { v = Math.max(0, Math.min(1, v)); const srgb = (v <= 0.0031308) ? v * 12.92 : 1.055 * Math.pow(v, 1 / 2.4) - 0.055; return Math.round(srgb * 255); }
@@ -205,6 +219,7 @@
             else { diffLab.b = Math.max(-128, Math.min(127, baseLab.b + change)); }
 
             let finalRgb = labToRgb(diffLab);
+            // Fallback check
             if (finalRgb.r === rgbColor.r && finalRgb.g === rgbColor.g && finalRgb.b === rgbColor.b) {
                  diffLab.l = Math.max(0, Math.min(100, baseLab.l + (changeDirection * 1.5)));
                  finalRgb = labToRgb(diffLab);
@@ -224,7 +239,7 @@
 
         // --- Game Logic Functions ---
 
-        function generateGrid() {
+        function generateGrid() { /* ... (unchanged) ... */
             if (isGameOver) return;
             gridElement.innerHTML = '';
             gridElement.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
@@ -249,7 +264,7 @@
             livesDisplay.textContent = lives;
         }
 
-        function handleSquareClick(event) {
+        function handleSquareClick(event) { /* ... (unchanged) ... */
             if (isGameOver || event.target.style.animationName === 'shake') return;
             const clickedSquare = event.target;
             const isDifferent = clickedSquare.dataset.isDiff === 'true';
@@ -271,7 +286,7 @@
             }
         }
 
-        function updateLevel() {
+        function updateLevel() { /* ... (unchanged) ... */
             if (isGameOver) return;
             if (level > 1 && (level - 1) % 5 === 0) {
                  gridSize = Math.min(8, Math.floor((level -1) / 5) + 2);
@@ -279,30 +294,54 @@
             generateGrid();
         }
 
+        /**
+         * Handles the game over state and sets up share links.
+         */
         function gameOver() {
             isGameOver = true;
             showMessage('Game Over!', 2000);
-            finalScoreDisplay.textContent = level - 1;
-            highScoreDisplay.textContent = highScore;
-            gameOverModal.classList.add('visible');
+
+            const finalScore = level - 1; // Score is last completed level
+            finalScoreDisplay.textContent = finalScore;
+            highScoreDisplay.textContent = highScore; // High score already updated
+
+            // --- Set up Social Share Links ---
+            const gameUrl = "https://color-game.mbdr.ai/"; // Your game's URL
+            const shareText = `I made it to level ${finalScore} of the Color Difference Game. Can you beat me? Try it:`;
+            const encodedUrl = encodeURIComponent(gameUrl);
+            const encodedText = encodeURIComponent(shareText);
+            const fullEncodedTextTwitter = encodeURIComponent(`${shareText} ${gameUrl}`); // Twitter includes URL in text
+
+            // X (Twitter)
+            shareTwitter.href = `https://twitter.com/intent/tweet?text=${fullEncodedTextTwitter}`;
+
+            // Facebook (Uses og:tags primarily, quote is optional)
+            shareFacebook.href = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedText}`;
+
+            // LinkedIn (Uses og:tags primarily)
+            shareLinkedIn.href = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`;
+            // --- End Social Share Setup ---
+
+
+            gameOverModal.classList.add('visible'); // Show the modal
             mainGameUI.classList.remove('visible'); // Hide main UI on game over
         }
 
-        function restartGame() {
+        function restartGame() { /* ... (unchanged) ... */
             isGameOver = false;
             level = 1;
             lives = 3;
             gridSize = 2;
-            gameOverModal.classList.remove('visible'); // Hide game over modal if visible
-            mainGameUI.classList.add('visible'); // Make sure main UI is visible
-            gridElement.style.opacity = '1'; // Reset grid opacity if dimmed previously
-            generateGrid(); // Start the first level
+            gameOverModal.classList.remove('visible');
+            mainGameUI.classList.add('visible');
+            gridElement.style.opacity = '1';
+            generateGrid();
         }
 
         /**
          * Initializes the listeners and shows the instruction modal.
          */
-        function initGame() {
+        function initGame() { /* ... (unchanged) ... */
             highScore = 0;
             restartButton.addEventListener('click', () => {
                 gameOverModal.classList.remove('visible');
@@ -312,7 +351,6 @@
                 instructionsModal.classList.remove('visible');
                 restartGame();
             });
-            // Instructions modal starts visible via CSS
         }
 
         // --- Start Game ---
