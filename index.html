@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Difference Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        /* Apply the game font */
+        body, button, .game-font {
+            font-family: 'Press Start 2P', cursive;
+        }
+        body {
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: space-between; min-height: 100vh; padding: 1rem;
+            background-color: #1a202c; color: #e2e8f0;
+        }
+        /* Grid Container */
+        #grid-container {
+            display: flex; justify-content: center; align-items: center;
+            width: 100%; max-width: 85vh; max-height: 75vh; aspect-ratio: 1 / 1;
+            padding: 10px; flex-grow: 1; flex-shrink: 1; margin-top: 1rem; margin-bottom: 1rem;
+        }
+        /* Grid */
+        #grid {
+             display: grid; width: 100%; height: 100%; aspect-ratio: 1 / 1; padding: 5px;
+             background-color: rgba(255, 255, 255, 0.1); border-radius: 10px;
+        }
+        /* Squares */
+        .color-square {
+            aspect-ratio: 1 / 1; border-radius: 8px; cursor: pointer;
+            transition: transform 0.1s ease-in-out; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            background-clip: padding-box;
+        }
+        .color-square:hover { transform: scale(1.03); z-index: 10; position: relative; }
+        /* Message box */
+        #message-box {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            padding: 10px 20px; background-color: rgba(0, 0, 0, 0.8); color: white;
+            border-radius: 5px; display: none; z-index: 100; font-size: 0.8rem; text-align: center;
+        }
+         /* Shake animation */
+         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+
+         /* Modal Base Styles (Common for Instructions and Game Over) */
+         .modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.75);
+            display: flex; justify-content: center; align-items: center; z-index: 200;
+            opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease;
+         }
+         .modal.visible { opacity: 1; visibility: visible; }
+         .modal-content {
+            background-color: #2d3748; color: #e2e8f0; padding: 2rem; border-radius: 10px;
+            text-align: center; border: 2px solid #4a5568; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            max-width: 90%; /* Ensure modal fits on small screens */
+            width: 500px; /* Max width for the content */
+         }
+         .modal-content h2 { font-size: 1.5rem; margin-bottom: 1rem; }
+         .modal-content p { font-size: 0.9rem; margin-bottom: 0.8rem; line-height: 1.5; } /* Adjusted font size and line height */
+         .modal-content button {
+            color: #1a202c; padding: 0.6rem 1.2rem; border: none; border-radius: 5px;
+            cursor: pointer; font-size: 1rem; margin-top: 1rem;
+            transition: background-color 0.2s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+         }
+         .modal-content button:hover { background-color: #38a169; /* Default hover */ }
+
+         /* Specific Modal Styles */
+         #instructions-modal .modal-content h2 { color: #f6e05e; } /* Yellow title */
+         #instructions-modal button { background-color: #63b3ed; } /* Blue button */
+         #instructions-modal button:hover { background-color: #4299e1; }
+
+         #game-over-modal .modal-content h2 { color: #e53e3e; } /* Red title */
+         #game-over-modal button { background-color: #48bb78; } /* Green button */
+         #game-over-modal button:hover { background-color: #38a169; }
+
+         .score-value { color: #63b3ed; font-weight: bold; }
+         .lives-container { font-size: 1rem; margin-left: 1rem; color: #f56565; }
+
+         /* Hide game UI initially */
+         .game-ui {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+         }
+         .game-ui.visible {
+             opacity: 1;
+             visibility: visible;
+         }
+
+    </style>
+</head>
+<body class="bg-gray-900 text-white game-font">
+
+    <div id="main-game-ui" class="w-full game-ui">
+        <div class="text-center w-full mt-4">
+            <h1 class="text-3xl mb-2 text-yellow-400">Color Diff Test</h1>
+            <div class="flex justify-center items-center mb-4 text-xl">
+                <div>Level: <span id="level" class="text-green-400">1</span></div>
+                <div class="lives-container">Lives: <span id="lives">3</span></div>
+            </div>
+        </div>
+        <div id="grid-container"><div id="grid" class="gap-1"></div></div>
+        <div class="h-10 flex-shrink-0"></div> </div>
+
+    <div id="message-box">Correct!</div>
+
+    <div id="instructions-modal" class="modal visible"> <div class="modal-content">
+            <h2>How To Play</h2>
+            <p>Welcome to the Color Diff Test!</p>
+            <p>Your goal is simple: Find the one square that has a slightly different color from all the others.</p>
+            <p>Click the different square to advance to the next level. The colors will get harder to tell apart, and the grid will grow!</p>
+            <p>You have 3 lives. Be careful!</p>
+            <button id="start-button">Start Game</button>
+        </div>
+    </div>
+
+    <div id="game-over-modal" class="modal">
+        <div class="modal-content">
+            <h2>Game Over!</h2>
+            <p>Your Score: <span id="final-score" class="score-value">0</span></p>
+            <p>High Score: <span id="high-score" class="score-value">0</span></p>
+            <button id="restart-button">Play Again?</button>
+        </div>
+    </div>
+
+    <script>
+        // --- Game State ---
+        let level = 1;
+        let gridSize = 2;
+        let baseColor, diffColor, diffIndex;
+        let lives = 3;
+        let highScore = 0;
+        let isGameOver = false;
+
+        // --- DOM Elements ---
+        const gridElement = document.getElementById('grid');
+        const levelDisplay = document.getElementById('level');
+        const livesDisplay = document.getElementById('lives');
+        const messageBox = document.getElementById('message-box');
+        const gameOverModal = document.getElementById('game-over-modal');
+        const finalScoreDisplay = document.getElementById('final-score');
+        const highScoreDisplay = document.getElementById('high-score');
+        const restartButton = document.getElementById('restart-button');
+        const instructionsModal = document.getElementById('instructions-modal');
+        const startButton = document.getElementById('start-button');
+        const mainGameUI = document.getElementById('main-game-ui');
+
+        // --- Color Conversion Constants & Functions (RGB <-> LAB) ---
+        // (Functions: srgbToLinear, linearToSrgb, rgbToXyz, xyzToLabHelper, xyzToLab, rgbToLab, labToXyzHelper, labToXyz, xyzToRgb, labToRgb are unchanged)
+        const REF_X = 95.047, REF_Y = 100.000, REF_Z = 108.883;
+        function srgbToLinear(v) { v /= 255; return (v <= 0.04045) ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }
+        function linearToSrgb(v) { v = Math.max(0, Math.min(1, v)); const srgb = (v <= 0.0031308) ? v * 12.92 : 1.055 * Math.pow(v, 1 / 2.4) - 0.055; return Math.round(srgb * 255); }
+        function rgbToXyz(rgb) { const rL=srgbToLinear(rgb.r), gL=srgbToLinear(rgb.g), bL=srgbToLinear(rgb.b); const x=rL*0.4124564+gL*0.3575761+bL*0.1804375; const y=rL*0.2126729+gL*0.7151522+bL*0.0721750; const z=rL*0.0193339+gL*0.1191920+bL*0.9503041; return {x:x*100, y:y*100, z:z*100}; }
+        function xyzToLabHelper(t) { const d=6/29; return (t > Math.pow(d, 3)) ? Math.pow(t, 1/3) : (t / (3 * Math.pow(d, 2))) + (4/29); }
+        function xyzToLab(xyz) { const fx=xyzToLabHelper(xyz.x/REF_X), fy=xyzToLabHelper(xyz.y/REF_Y), fz=xyzToLabHelper(xyz.z/REF_Z); const l=116*fy-16, a=500*(fx-fy), b=200*(fy-fz); return {l:l, a:a, b:b}; }
+        function rgbToLab(rgb) { return xyzToLab(rgbToXyz(rgb)); }
+        function labToXyzHelper(t) { const d=6/29; return (t > d) ? Math.pow(t, 3) : 3 * Math.pow(d, 2) * (t - 4/29); }
+        function labToXyz(lab) { const fy=(lab.l+16)/116, fx=lab.a/500+fy, fz=fy-lab.b/200; const x=labToXyzHelper(fx)*REF_X, y=labToXyzHelper(fy)*REF_Y, z=labToXyzHelper(fz)*REF_Z; return {x:x, y:y, z:z}; }
+        function xyzToRgb(xyz) { const x=xyz.x/100, y=xyz.y/100, z=xyz.z/100; const rL=x*3.2404542+y*-1.5371385+z*-0.4985314; const gL=x*-0.9692660+y*1.8760108+z*0.0415560; const bL=x*0.0556434+y*-0.2040259+z*1.0572252; const r=linearToSrgb(rL), g=linearToSrgb(gL), b=linearToSrgb(bL); return {r:r, g:g, b:b}; }
+        function labToRgb(lab) { return xyzToRgb(labToXyz(lab)); }
+
+
+        // --- Utility Functions ---
+        function getRandomInt(min, max) { return Math.floor(Math.random() * (max - min)) + min; }
+        function randomRgbColor() { return { r: getRandomInt(30, 226), g: getRandomInt(30, 226), b: getRandomInt(30, 226) }; }
+
+        /**
+         * Generates a slightly different color using LAB space for perceptual uniformity.
+         */
+        function slightlyDifferentColor(rgbColor, currentLevel) {
+            const labDelta = Math.max(1.5, Math.floor(500 / (currentLevel + 20)) / 4);
+            const baseLab = rgbToLab(rgbColor);
+            let diffLab = { ...baseLab };
+            const changeIndex = getRandomInt(0, 3);
+            const changeDirection = Math.random() < 0.5 ? -1 : 1;
+            const change = labDelta * changeDirection;
+
+            if (changeIndex === 0) { diffLab.l = Math.max(0, Math.min(100, baseLab.l + change)); }
+            else if (changeIndex === 1) { diffLab.a = Math.max(-128, Math.min(127, baseLab.a + change)); }
+            else { diffLab.b = Math.max(-128, Math.min(127, baseLab.b + change)); }
+
+            let finalRgb = labToRgb(diffLab);
+            if (finalRgb.r === rgbColor.r && finalRgb.g === rgbColor.g && finalRgb.b === rgbColor.b) {
+                 diffLab.l = Math.max(0, Math.min(100, baseLab.l + (changeDirection * 1.5)));
+                 finalRgb = labToRgb(diffLab);
+                 if (finalRgb.r === rgbColor.r && finalRgb.g === rgbColor.g && finalRgb.b === rgbColor.b) {
+                    finalRgb.b = (rgbColor.b + 3) % 256;
+                 }
+            }
+            return finalRgb;
+        }
+
+        function rgbToCssString(rgbColor) { return `rgb(${rgbColor.r}, ${rgbColor.g}, ${rgbColor.b})`; }
+        function showMessage(text, duration = 1000) {
+            messageBox.textContent = text; messageBox.style.display = 'block';
+            if (messageBox.timeoutId) clearTimeout(messageBox.timeoutId);
+            messageBox.timeoutId = setTimeout(() => { messageBox.style.display = 'none'; messageBox.timeoutId = null; }, duration);
+        }
+
+        // --- Game Logic Functions ---
+
+        function generateGrid() {
+            if (isGameOver) return;
+            gridElement.innerHTML = '';
+            gridElement.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
+            const gapSize = Math.max(1, 4 - Math.floor(gridSize / 2));
+            gridElement.style.gap = `${gapSize}px`;
+
+            const totalSquares = gridSize * gridSize;
+            baseColor = randomRgbColor();
+            diffColor = slightlyDifferentColor(baseColor, level);
+            diffIndex = getRandomInt(0, totalSquares);
+
+            for (let i = 0; i < totalSquares; i++) {
+                const square = document.createElement('div');
+                square.classList.add('color-square');
+                const colorToUse = (i === diffIndex) ? diffColor : baseColor;
+                square.style.backgroundColor = rgbToCssString(colorToUse);
+                square.dataset.index = i; square.dataset.isDiff = (i === diffIndex);
+                square.addEventListener('click', handleSquareClick);
+                gridElement.appendChild(square);
+            }
+            levelDisplay.textContent = level;
+            livesDisplay.textContent = lives;
+        }
+
+        function handleSquareClick(event) {
+            if (isGameOver || event.target.style.animationName === 'shake') return;
+            const clickedSquare = event.target;
+            const isDifferent = clickedSquare.dataset.isDiff === 'true';
+
+            if (isDifferent) {
+                showMessage('Correct!', 500);
+                highScore = Math.max(highScore, level);
+                level++;
+                updateLevel();
+            } else {
+                lives--;
+                livesDisplay.textContent = lives;
+                if (lives <= 0) { gameOver(); }
+                else {
+                    showMessage(`Incorrect! ${lives} ${lives === 1 ? 'life' : 'lives'} left.`, 1200);
+                    clickedSquare.style.animation = 'shake 0.3s';
+                    setTimeout(() => { clickedSquare.style.animation = ''; }, 300);
+                }
+            }
+        }
+
+        function updateLevel() {
+            if (isGameOver) return;
+            if (level > 1 && (level - 1) % 5 === 0) {
+                 gridSize = Math.min(8, Math.floor((level -1) / 5) + 2);
+            }
+            generateGrid();
+        }
+
+        function gameOver() {
+            isGameOver = true;
+            showMessage('Game Over!', 2000);
+            finalScoreDisplay.textContent = level - 1;
+            highScoreDisplay.textContent = highScore;
+            gameOverModal.classList.add('visible');
+            gridElement.style.opacity = '0.5';
+            mainGameUI.classList.remove('visible'); // Hide main UI on game over
+        }
+
+        function restartGame() {
+            isGameOver = false;
+            level = 1;
+            lives = 3;
+            gridSize = 2;
+            gameOverModal.classList.remove('visible'); // Hide game over modal if visible
+            gridElement.style.opacity = '1';
+            mainGameUI.classList.add('visible'); // Make sure main UI is visible
+            generateGrid(); // Start the first level
+        }
+
+        /**
+         * Initializes the listeners and shows the instruction modal.
+         */
+        function initGame() {
+            highScore = 0; // Reset high score only on initial load/refresh
+            // Listener for the button in the Game Over modal
+            restartButton.addEventListener('click', () => {
+                // Hide game over, then restart
+                gameOverModal.classList.remove('visible');
+                restartGame();
+            });
+            // Listener for the button in the Instructions modal
+            startButton.addEventListener('click', () => {
+                // Hide instructions, then start the actual game
+                instructionsModal.classList.remove('visible');
+                restartGame(); // This will make the main UI visible and generate grid
+            });
+
+            // Instructions modal is visible by default via CSS class 'visible'
+            // Game UI is hidden by default via CSS class 'game-ui'
+        }
+
+        // --- Start Game ---
+        window.onload = initGame;
+
+    </script>
+
+</body>
+</html>
