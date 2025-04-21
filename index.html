@@ -20,6 +20,16 @@
     <meta property="twitter:image" content="/assets/preview.png">
     <link rel="icon" href="/favicon.png" sizes="any">
     <link rel="shortcut icon" href="/favicon.png">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6P5YEMZ84D"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-6P5YEMZ84D', { website: "Color Difference Game"});
+    </script>
     <style>
         /* Apply the game font */
         body, button, .game-font, input, textarea, select { /* Ensure all interactive elements use the font */
@@ -314,7 +324,7 @@
             const shareText = `I made it to level ${finalScore} of the Color Difference Game. Can you beat me? Try it:`;
             const encodedUrl = encodeURIComponent(gameUrl);
             const encodedText = encodeURIComponent(shareText);
-            const fullEncodedTextTwitter = encodeURIComponent(`${shareText} ${gameUrl}`); // Twitter includes URL in text
+            const fullEncodedTextTwitter = encodeURIComponent(`${shareText} ${gameUrl} #ColorDiffGame`); // Twitter includes URL in text
 
             // X (Twitter)
             shareTwitter.href = `https://twitter.com/intent/tweet?text=${fullEncodedTextTwitter}`;
