@@ -172,6 +172,14 @@
         </div>
     </div>
 
+    <footer class="w-full text-center text-sm text-gray-400 py-6 game-font">
+        <p class="mb-1"> Copyright &copy; <span id="copyright-year"></span> Megan Ben Dor Ruthven
+        </p>
+        <a href="https://mbdr.ai" target="_blank" rel="noopener noreferrer" class="hover:text-gray-200 underline">
+            About
+        </a>
+    </footer>
+
     <script>
         // --- Game State ---
         let level = 1;
@@ -365,6 +373,7 @@
                 instructionsModal.classList.remove('visible');
                 restartGame();
             });
+            document.getElementById('copyright-year').textContent = new Date().getFullYear();
         }
 
         // --- Start Game ---
