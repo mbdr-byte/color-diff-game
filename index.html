@@ -18,8 +18,42 @@
     <meta property="twitter:title" content="Hue Hero - How Good Is Your Vision?">
     <meta property="twitter:description" content="Challenge your perception! Find the odd color out in the addictive Hue Hero web game.">
     <meta property="twitter:image" content="/assets/preview.png">
-    <link rel="icon" href="/favicon.png" sizes="any">
-    <link rel="shortcut icon" href="/favicon.png">
+    <link rel="icon" href="/assets/favicon.svg" sizes="any" type="image/svg+xml">
+    <link rel="shortcut icon" href="/assets/favicon.svg" type="image/svg+xml">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Hue Hero",
+      "url": "https://hue-hero.com/",
+      "description": "A color perception game that challenges players to find the different colored square among identical ones. The game gets progressively harder with more subtle color differences.",
+      "applicationCategory": "Game",
+      "genre": "Puzzle",
+      "image": "/assets/preview.png",
+      "browserRequirements": "Requires JavaScript. Works on all modern browsers.",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "Megan Ben Dor Ruthven",
+        "url": "https://mbdr.ai"
+      },
+      "potentialAction": {
+        "@type": "PlayAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://hue-hero.com/"
+        }
+      },
+      "gamePlayMode": "SinglePlayer",
+      "inLanguage": "en-US"
+    }
+    </script>
 
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-BG87052JZD"></script>
     <script>
@@ -231,6 +265,10 @@
         </p>
         <a href="https://mbdr.ai" target="_blank" rel="noopener noreferrer" class="hover:text-gray-200 underline">
             About
+        </a>
+        <span class="mx-2">|</span>
+        <a href="https://github.com/mbdr-byte/color-diff-game" target="_blank" rel="noopener noreferrer" class="hover:text-gray-200 underline">
+            GitHub
         </a>
     </footer>
     <div id="cookie-consent-banner" class="game-font">
