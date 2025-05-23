@@ -526,12 +526,22 @@
             if (hasGaConsent) { gtag('event', 'game_over', { 'score': finalScore, 'session_high_score': highScore }); }
             const gameUrl = "https://hue-hero.com/";
             const shareText = `I made it to level ${finalScore} in Hue Hero. Can you beat me? Try it:`;
-            const encodedUrl = encodeURIComponent(gameUrl);
+            const encodedUrl = encodeURIComponent(gameUrl + "?utm_source=share&utm_medium=social");
             const encodedText = encodeURIComponent(shareText);
-            const fullEncodedTextTwitter = encodeURIComponent(`${shareText} ${gameUrl} #HueHero #ColorGame`);
+            
+            // Twitter/X with UTM parameters
+            const twitterUrl = gameUrl + "?utm_source=twitter&utm_medium=social&utm_campaign=share";
+            const fullEncodedTextTwitter = encodeURIComponent(`${shareText} ${twitterUrl} #HueHero #ColorGame`);
             shareTwitter.href = `https://twitter.com/intent/tweet?text=${fullEncodedTextTwitter}`;
-            shareFacebook.href = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedText}`;
-            shareLinkedIn.href = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`;
+            
+            // Facebook with UTM parameters
+            const facebookUrl = gameUrl + "?utm_source=facebook&utm_medium=social&utm_campaign=share";
+            shareFacebook.href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(facebookUrl)}&quote=${encodedText}`;
+            
+            // LinkedIn with UTM parameters
+            const linkedinUrl = gameUrl + "?utm_source=linkedin&utm_medium=social&utm_campaign=share";
+            shareLinkedIn.href = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(linkedinUrl)}`;
+            
             gameOverModal.classList.add('visible');
             mainGameUI.classList.remove('visible');
         }
